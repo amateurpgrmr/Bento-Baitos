@@ -21,7 +21,7 @@ export default function Home(){
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">Welcome to Bento Baitos</h1>
           <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
-            Fresh, delicious meals delivered to your doorstep
+            Our P4 Project: A Taste of Home
           </p>
         </div>
       </div>

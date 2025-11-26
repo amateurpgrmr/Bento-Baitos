@@ -24,9 +24,7 @@ const MENU_ITEMS = {
     image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=800&q=60',
     description: 'Rich espresso blended with cold milk over ice. Smooth and refreshing.',
     customizations: [
-      { id: 'size', name: 'Size', options: ['Regular', 'Large'] },
-      { id: 'milk', name: 'Milk Type', options: ['Whole Milk', 'Oat Milk', 'Almond Milk', 'Soy Milk'] },
-      { id: 'sweetness', name: 'Sweetness', options: ['No Sugar', '25%', '50%', '75%', '100%'] }
+      { id: 'ice', name: 'Ice', options: ['Ice', 'Less Ice', 'No Ice'] }
     ]
   },
   '3': {
