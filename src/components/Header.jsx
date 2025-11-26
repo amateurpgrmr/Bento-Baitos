@@ -17,7 +17,7 @@ export default function Header() {
             className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group"
           >
             <img
-              src="/assets/logo.svg"
+              src="/logo.jpeg"
               alt="Bento Baitos"
               className="h-10 md:h-14 group-hover:scale-105 transition-transform"
             />

@@ -59,7 +59,7 @@ export default function ItemPage(){
     id,
     name: 'Item Not Found',
     price: 0,
-    image: '/assets/logo.svg',
+    image: '/logo.jpeg',
     description: 'This item does not exist.',
     customizations: []
   }
