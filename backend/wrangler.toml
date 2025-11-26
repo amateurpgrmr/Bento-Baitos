@@ -1,0 +1,32 @@
+# Bento Baitos Backend Configuration
+# This file configures your Cloudflare Worker
+
+name = "bento-baitos-api"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# D1 Database binding
+# After creating your D1 database, add the binding here
+[[d1_databases]]
+binding = "DB" # This is the variable name you'll use in your code
+database_name = "bento-baitos-db" # Your D1 database name
+database_id = "YOUR_DATABASE_ID" # Replace with your actual D1 database ID
+
+# R2 Bucket binding (for payment proof images)
+# After creating your R2 bucket, add the binding here
+[[r2_buckets]]
+binding = "BUCKET" # This is the variable name you'll use in your code
+bucket_name = "bento-baitos-proofs" # Your R2 bucket name
+
+# Environment variables
+[vars]
+R2_PUBLIC_URL = "https://your-r2-domain.com" # Your R2 public URL or custom domain
+
+# Production environment settings
+[env.production]
+name = "bento-baitos-api-prod"
+vars = { R2_PUBLIC_URL = "https://your-production-r2-domain.com" }
+
+# Development environment settings
+[env.development]
+name = "bento-baitos-api-dev"

@@ -1,0 +1,29 @@
+{
+  "name": "bento-baitos-backend",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers backend for Bento Baitos cafe ordering system",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:prod": "wrangler deploy --env production",
+    "db:create": "wrangler d1 create bento-baitos-db",
+    "db:init": "wrangler d1 execute bento-baitos-db --file=schema.sql",
+    "db:query": "wrangler d1 execute bento-baitos-db --command",
+    "logs": "wrangler tail",
+    "r2:create": "wrangler r2 bucket create bento-baitos-proofs"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "d1",
+    "r2",
+    "cafe",
+    "ordering-system"
+  ],
+  "author": "Bento Baitos",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
