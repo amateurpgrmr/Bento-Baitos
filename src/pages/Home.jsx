@@ -2,10 +2,10 @@ import { useState } from 'react'
 import ItemCard from '../ui/ItemCard'
 
 const SAMPLE_ITEMS = [
-  {id:1, name:'Iced Latte', price_cents:28000, category:'Coffee', img:'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=800&q=60'},
-  {id:2, name:'Matcha Frappe', price_cents:32000, category:'Tea', img:'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?w=800&q=60'},
-  {id:3, name:'Blueberry Muffin', price_cents:22000, category:'Pastries', img:'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?w=800&q=60'},
-  {id:4, name:'Ham Sandwich', price_cents:35000, category:'Sandwiches', img:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=60'}
+  {id:1, name:'Curry Rice', price_cents:39000, category:'Rice Bowls', img:'/curry.jpeg'},
+  {id:2, name:'Panda Teriyaki', price_cents:35000, category:'Rice Bowls', img:'/panda teriyaki.jpeg'},
+  {id:3, name:'Japanese Sando', price_cents:42000, category:'Desserts', img:'/japanese sando.jpeg'},
+  {id:4, name:'Java Tea', price_cents:18000, category:'Beverages', img:'/java tea.jpeg'}
 ]
 
 export default function Home(){

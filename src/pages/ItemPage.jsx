@@ -9,41 +9,40 @@ const MENU_ITEMS = {
     id: '1',
     name: 'Curry Rice',
     price: 39000,
-    image: '/assets/curry-rice.svg',
-    description: 'Savory Japanese curry served over steamed rice with your choice of protein and spice level.',
+    image: '/curry.jpeg',
+    description: 'A hearty curry made with tender pork, carrots, and potatoes for a rich, comforting flavor in every bite.',
     customizations: [
       { id: 'spice', name: 'Spice Level', options: ['Mild', 'Medium', 'Hot', 'Extra Hot'] },
-      { id: 'protein', name: 'Protein', options: ['Chicken', 'Beef', 'Tofu', 'Mixed Vegetables'] },
       { id: 'extras', name: 'Add-ons', options: ['Egg', 'Cheese', 'Extra Rice'], isMulti: true }
     ]
   },
   '2': {
     id: '2',
-    name: 'Iced Latte',
-    price: 28000,
-    image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=800&q=60',
-    description: 'Rich espresso blended with cold milk over ice. Smooth and refreshing.',
+    name: 'Panda Teriyaki',
+    price: 35000,
+    image: '/panda teriyaki.jpeg',
+    description: 'Tender chicken glazed with teriyaki sauce, served with rice alongside cabbage for a healthy delicious meal',
     customizations: [
-      { id: 'ice', name: 'Ice', options: ['Ice', 'Less Ice', 'No Ice'] }
+      { id: 'extras', name: 'Add-ons', options: ['Extra Chicken', 'Extra Vegetables', 'Fried Egg'], isMulti: true }
     ]
   },
   '3': {
     id: '3',
-    name: 'Blueberry Muffin',
-    price: 22000,
-    image: 'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?w=800&q=60',
-    description: 'Freshly baked muffin loaded with juicy blueberries. Perfect with coffee!',
+    name: 'Japanese Sando',
+    price: 42000,
+    image: '/japanese sando.jpeg',
+    description: 'A delicacy filled with sweet whipped cream, fresh shine muscat, strawberries, and a slice of mango!',
     customizations: []
   },
   '4': {
     id: '4',
-    name: 'Ham Sandwich',
-    price: 35000,
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=60',
-    description: 'Artisan bread with premium ham, lettuce, tomato, and our special sauce.',
+    name: 'Java Tea',
+    price: 18000,
+    image: '/java tea.jpeg',
+    description: 'A refreshing herbal blend made from pandan leaf, black tea, and basil seeds for a naturally aromatic and soothing drink.',
     customizations: [
-      { id: 'bread', name: 'Bread', options: ['White', 'Wheat', 'Sourdough'] },
-      { id: 'extras', name: 'Add-ons', options: ['Cheese', 'Avocado', 'Extra Ham'], isMulti: true }
+      { id: 'ice', name: 'Ice Level', options: ['Regular Ice', 'Less Ice', 'No Ice'] },
+      { id: 'sweetness', name: 'Sweetness', options: ['Regular', 'Less Sweet', 'No Sugar'] }
     ]
   }
 }
