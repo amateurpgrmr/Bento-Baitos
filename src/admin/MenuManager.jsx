@@ -1,31 +1,33 @@
-import { useState } from 'react'
 export default function MenuManager(){
-  const [items, setItems] = useState([
-    {id:1,name:'Iced Latte',price_cents:28000,category:'Coffee'}
-  ])
-  const [newName, setNewName] = useState('')
-  function addItem(){
-    setItems(prev=>[...prev, {id:Date.now(), name:newName, price_cents:0, category:'Uncategorized'}])
-    setNewName('')
-  }
+  const menuItems = [
+    {id:1, name:'Curry Rice', price:20000, category:'Rice Bowls', description:'A hearty curry made with tender pork, carrots, and potatoes for a rich, comforting flavor in every bite.'},
+    {id:2, name:'Panda Teriyaki', price:20000, category:'Rice Bowls', description:'Tender chicken glazed with teriyaki sauce, served with rice alongside cabbage for a healthy delicious meal'},
+    {id:3, name:'Japanese Sando', price:10000, category:'Desserts', description:'A delicacy filled with sweet whipped cream, fresh shine muscat, strawberries, and a slice of mango!'},
+    {id:4, name:'Java Tea', price:10000, category:'Beverages', description:'A refreshing herbal blend made from pandan leaf, black tea, and basil seeds for a naturally aromatic and soothing drink.'}
+  ]
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Menu Manager</h2>
-      <div className="mb-4 flex gap-2">
-        <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="New item name" className="p-2 border rounded"/>
-        <button onClick={addItem} className="px-3 py-1 bg-black text-white rounded">Add</button>
+
+      <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-lg mb-6">
+        <p className="font-medium">Current Menu (View Only)</p>
+        <p className="text-sm mt-1">Menu items are currently managed in the code. To update menu items, prices, or descriptions, edit the files in <code className="bg-blue-100 px-1 py-0.5 rounded">src/pages/ItemPage.jsx</code> and <code className="bg-blue-100 px-1 py-0.5 rounded">src/pages/Home.jsx</code></p>
       </div>
-      <div>
-        {items.map(it=>(
-          <div key={it.id} className="p-3 bg-white rounded mb-2 flex justify-between items-center shadow">
-            <div>
-              <div className="font-medium">{it.name}</div>
-              <div className="text-sm text-gray-500">{it.category} • Rp {it.price_cents}</div>
+
+      <div className="grid gap-4">
+        {menuItems.map(item=>(
+          <div key={item.id} className="p-4 bg-white rounded-lg shadow border border-gray-200">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-bold text-lg text-gray-800">{item.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded">{item.category}</span>
+                  <span className="text-lg font-bold text-[#4B7342]">Rp {item.price.toLocaleString()}</span>
+                </div>
+              </div>
             </div>
-            <div className="text-sm">
-              <button className="mr-2 text-blue-600">Edit</button>
-              <button className="text-red-600">Delete</button>
-            </div>
+            <p className="text-sm text-gray-600 mt-2">{item.description}</p>
           </div>
         ))}
       </div>
