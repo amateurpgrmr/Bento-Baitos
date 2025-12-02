@@ -33,13 +33,6 @@ export default function Header() {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#6B4E3D] group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link
-              to="/admin"
-              className="text-base font-semibold text-gray-600 hover:text-[#6B4E3D] transition-colors duration-200 relative group"
-            >
-              Admin
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#6B4E3D] group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link
               to="/cart"
               className="relative bg-gradient-to-r from-[#4B7342] to-[#5a8850] text-white px-6 py-2.5 rounded-full text-base font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center gap-2"
             >
@@ -80,13 +73,6 @@ export default function Header() {
               className="block px-4 py-3 text-base font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#6B4E3D] rounded-lg transition-colors"
             >
               Menu
-            </Link>
-            <Link
-              to="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-3 text-base font-semibold text-gray-600 hover:bg-gray-50 hover:text-[#6B4E3D] rounded-lg transition-colors"
-            >
-              Admin
             </Link>
             <Link
               to="/cart"

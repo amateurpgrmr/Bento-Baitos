@@ -2,10 +2,10 @@ import { useState } from 'react'
 import ItemCard from '../ui/ItemCard'
 
 const SAMPLE_ITEMS = [
-  {id:1, name:'Curry Rice', price_cents:39000, category:'Rice Bowls', img:'/curry.jpeg'},
-  {id:2, name:'Panda Teriyaki', price_cents:35000, category:'Rice Bowls', img:'/panda teriyaki.jpeg'},
-  {id:3, name:'Japanese Sando', price_cents:42000, category:'Desserts', img:'/japanese sando.jpeg'},
-  {id:4, name:'Java Tea', price_cents:18000, category:'Beverages', img:'/java tea.jpeg'}
+  {id:1, name:'Curry Rice', price_cents:20000, category:'Rice Bowls', img:'/curry.jpeg'},
+  {id:2, name:'Panda Teriyaki', price_cents:20000, category:'Rice Bowls', img:'/panda teriyaki.jpeg'},
+  {id:3, name:'Japanese Sando', price_cents:10000, category:'Desserts', img:'/japanese sando.jpeg'},
+  {id:4, name:'Java Tea', price_cents:10000, category:'Beverages', img:'/java tea.jpeg'}
 ]
 
 export default function Home(){
@@ -16,11 +16,20 @@ export default function Home(){
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#6B4E3D] to-[#8B6F5F] text-white py-12 px-4 mb-8 shadow-lg">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">Welcome to Bento Baitos</h1>
-          <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto">
+      {/* Hero Section with Background Image */}
+      <div
+        className="relative text-white py-24 px-4 mb-8 shadow-lg bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(/group pic.jpeg)',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+        <div className="relative max-w-7xl mx-auto text-center z-10">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">Welcome to Bento Baitos</h1>
+          <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-md">
             Our P4 Project: A Taste of Home
           </p>
         </div>
@@ -113,9 +122,23 @@ export default function Home(){
 
         {/* Menu Grid */}
         {items.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {items.map(i=> <ItemCard key={i.id} item={i} />)}
-          </div>
+          <>
+            {/* Mobile: Horizontal Scrollable */}
+            <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">
+              <div className="flex gap-4" style={{ width: 'max-content' }}>
+                {items.map(i=> (
+                  <div key={i.id} style={{ width: '280px', flexShrink: 0 }}>
+                    <ItemCard item={i} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop: 4 Column Grid */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {items.map(i=> <ItemCard key={i.id} item={i} />)}
+            </div>
+          </>
         ) : (
           <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
             <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

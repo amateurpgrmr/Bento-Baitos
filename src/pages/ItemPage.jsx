@@ -8,7 +8,7 @@ const MENU_ITEMS = {
   '1': {
     id: '1',
     name: 'Curry Rice',
-    price: 39000,
+    price: 20000,
     image: '/curry.jpeg',
     description: 'A hearty curry made with tender pork, carrots, and potatoes for a rich, comforting flavor in every bite.',
     customizations: [
@@ -19,7 +19,7 @@ const MENU_ITEMS = {
   '2': {
     id: '2',
     name: 'Panda Teriyaki',
-    price: 35000,
+    price: 20000,
     image: '/panda teriyaki.jpeg',
     description: 'Tender chicken glazed with teriyaki sauce, served with rice alongside cabbage for a healthy delicious meal',
     customizations: [
@@ -29,7 +29,7 @@ const MENU_ITEMS = {
   '3': {
     id: '3',
     name: 'Japanese Sando',
-    price: 42000,
+    price: 10000,
     image: '/japanese sando.jpeg',
     description: 'A delicacy filled with sweet whipped cream, fresh shine muscat, strawberries, and a slice of mango!',
     customizations: []
@@ -37,7 +37,7 @@ const MENU_ITEMS = {
   '4': {
     id: '4',
     name: 'Java Tea',
-    price: 18000,
+    price: 10000,
     image: '/java tea.jpeg',
     description: 'A refreshing herbal blend made from pandan leaf, black tea, and basil seeds for a naturally aromatic and soothing drink.',
     customizations: [
