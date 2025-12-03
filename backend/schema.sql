@@ -48,16 +48,23 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- Create index for faster order item queries
 CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
 
--- Menu items table (optional - if you want to store menu in DB)
+-- Menu items table
 CREATE TABLE IF NOT EXISTS menu_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT,
   price INTEGER NOT NULL, -- in cents (Rp)
-  category TEXT, -- e.g., coffee, food, snacks
+  category TEXT, -- e.g., Rice Bowls, Desserts, Beverages
   image_url TEXT,
-  available BOOLEAN DEFAULT 1,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  stock INTEGER DEFAULT 0, -- Current stock quantity (0 = unlimited/not tracked)
+  low_stock_threshold INTEGER DEFAULT 5, -- Alert when stock is below this
+  available INTEGER DEFAULT 1, -- 1 = available, 0 = unavailable/sold out
+  is_featured INTEGER DEFAULT 0, -- 1 = featured item, 0 = regular
+  sort_order INTEGER DEFAULT 0, -- For custom ordering
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_menu_category ON menu_items(category);
+CREATE INDEX IF NOT EXISTS idx_menu_available ON menu_items(available);
+CREATE INDEX IF NOT EXISTS idx_menu_featured ON menu_items(is_featured);

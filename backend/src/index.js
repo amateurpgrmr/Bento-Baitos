@@ -43,6 +43,15 @@ export default {
         response = await getOrdersByPhone(request, env, phone);
       }
 
+      // Menu endpoints (public)
+      else if (path === '/api/menu' && request.method === 'GET') {
+        response = await getMenuItems(request, env);
+      }
+      else if (path.match(/^\/api\/menu\/\d+$/) && request.method === 'GET') {
+        const itemId = path.split('/')[3];
+        response = await getMenuItem(request, env, itemId);
+      }
+
       // Admin endpoints
       else if (path === '/api/admin/orders' && request.method === 'GET') {
         response = await getAdminOrders(request, env);
@@ -57,6 +66,30 @@ export default {
       }
       else if (path === '/api/admin/stats' && request.method === 'GET') {
         response = await getAdminStats(request, env);
+      }
+
+      // Admin menu management endpoints
+      else if (path === '/api/admin/menu' && request.method === 'GET') {
+        response = await getAdminMenuItems(request, env);
+      }
+      else if (path === '/api/admin/menu' && request.method === 'POST') {
+        response = await createMenuItem(request, env);
+      }
+      else if (path.match(/^\/api\/admin\/menu\/\d+$/) && request.method === 'PUT') {
+        const itemId = path.split('/')[4];
+        response = await updateMenuItem(request, env, itemId);
+      }
+      else if (path.match(/^\/api\/admin\/menu\/\d+$/) && request.method === 'DELETE') {
+        const itemId = path.split('/')[4];
+        response = await deleteMenuItem(request, env, itemId);
+      }
+      else if (path.match(/^\/api\/admin\/menu\/\d+\/stock$/) && request.method === 'PUT') {
+        const itemId = path.split('/')[4];
+        response = await updateMenuStock(request, env, itemId);
+      }
+      else if (path.match(/^\/api\/admin\/menu\/\d+\/toggle$/) && request.method === 'PUT') {
+        const itemId = path.split('/')[4];
+        response = await toggleMenuAvailability(request, env, itemId);
       }
 
       // Health check
@@ -575,6 +608,318 @@ async function getAdminStats(request, env) {
   } catch (error) {
     console.error('Error fetching admin stats:', error);
     return jsonResponse({ error: 'Failed to fetch stats', details: error.message }, 500);
+  }
+}
+
+// ============================================
+// MENU API HANDLERS (PUBLIC)
+// ============================================
+
+/**
+ * GET /api/menu
+ * Get all available menu items (public endpoint)
+ */
+async function getMenuItems(request, env) {
+  try {
+    const db = env.DB;
+
+    const items = await db.prepare(`
+      SELECT
+        id, name, description, price, category, image_url,
+        stock, low_stock_threshold, available, is_featured, sort_order
+      FROM menu_items
+      WHERE available = 1
+      ORDER BY sort_order ASC, name ASC
+    `).all();
+
+    return jsonResponse({
+      items: items.results.map(item => ({
+        ...item,
+        price_cents: item.price, // For backwards compatibility
+        is_low_stock: item.stock > 0 && item.stock <= item.low_stock_threshold,
+        is_sold_out: item.stock === 0 && item.available === 0
+      }))
+    });
+
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    return jsonResponse({ error: 'Failed to fetch menu items', details: error.message }, 500);
+  }
+}
+
+/**
+ * GET /api/menu/:id
+ * Get single menu item by ID
+ */
+async function getMenuItem(request, env, itemId) {
+  try {
+    const db = env.DB;
+
+    const item = await db.prepare(`
+      SELECT
+        id, name, description, price, category, image_url,
+        stock, low_stock_threshold, available, is_featured
+      FROM menu_items
+      WHERE id = ? AND available = 1
+    `).bind(itemId).first();
+
+    if (!item) {
+      return jsonResponse({ error: 'Menu item not found' }, 404);
+    }
+
+    return jsonResponse({
+      ...item,
+      price_cents: item.price,
+      is_low_stock: item.stock > 0 && item.stock <= item.low_stock_threshold,
+      is_sold_out: item.stock === 0 && item.available === 0
+    });
+
+  } catch (error) {
+    console.error('Error fetching menu item:', error);
+    return jsonResponse({ error: 'Failed to fetch menu item', details: error.message }, 500);
+  }
+}
+
+// ============================================
+// ADMIN MENU MANAGEMENT HANDLERS
+// ============================================
+
+/**
+ * GET /api/admin/menu
+ * Get all menu items (including unavailable) for admin
+ */
+async function getAdminMenuItems(request, env) {
+  try {
+    const db = env.DB;
+
+    const items = await db.prepare(`
+      SELECT
+        id, name, description, price, category, image_url,
+        stock, low_stock_threshold, available, is_featured, sort_order,
+        created_at, updated_at
+      FROM menu_items
+      ORDER BY sort_order ASC, created_at DESC
+    `).all();
+
+    return jsonResponse({
+      items: items.results.map(item => ({
+        ...item,
+        price_cents: item.price,
+        is_low_stock: item.stock > 0 && item.stock <= item.low_stock_threshold,
+        is_sold_out: item.stock === 0 && item.available === 0
+      }))
+    });
+
+  } catch (error) {
+    console.error('Error fetching admin menu items:', error);
+    return jsonResponse({ error: 'Failed to fetch menu items', details: error.message }, 500);
+  }
+}
+
+/**
+ * POST /api/admin/menu
+ * Create new menu item
+ */
+async function createMenuItem(request, env) {
+  try {
+    const body = await request.json();
+    const { name, description, price, category, image_url, stock, low_stock_threshold, is_featured, sort_order } = body;
+
+    if (!name || !price || !category) {
+      return jsonResponse({ error: 'Missing required fields: name, price, category' }, 400);
+    }
+
+    const db = env.DB;
+
+    const result = await db.prepare(`
+      INSERT INTO menu_items (name, description, price, category, image_url, stock, low_stock_threshold, is_featured, sort_order, available)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).bind(
+      name,
+      description || null,
+      price,
+      category,
+      image_url || null,
+      stock || 0,
+      low_stock_threshold || 5,
+      is_featured ? 1 : 0,
+      sort_order || 0
+    ).run();
+
+    return jsonResponse({
+      success: true,
+      item_id: result.meta.last_row_id,
+      message: 'Menu item created successfully'
+    }, 201);
+
+  } catch (error) {
+    console.error('Error creating menu item:', error);
+    return jsonResponse({ error: 'Failed to create menu item', details: error.message }, 500);
+  }
+}
+
+/**
+ * PUT /api/admin/menu/:id
+ * Update menu item
+ */
+async function updateMenuItem(request, env, itemId) {
+  try {
+    const body = await request.json();
+    const { name, description, price, category, image_url, stock, low_stock_threshold, is_featured, sort_order } = body;
+
+    const db = env.DB;
+
+    const result = await db.prepare(`
+      UPDATE menu_items
+      SET
+        name = COALESCE(?, name),
+        description = COALESCE(?, description),
+        price = COALESCE(?, price),
+        category = COALESCE(?, category),
+        image_url = COALESCE(?, image_url),
+        stock = COALESCE(?, stock),
+        low_stock_threshold = COALESCE(?, low_stock_threshold),
+        is_featured = COALESCE(?, is_featured),
+        sort_order = COALESCE(?, sort_order),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      name || null,
+      description || null,
+      price || null,
+      category || null,
+      image_url || null,
+      stock !== undefined ? stock : null,
+      low_stock_threshold || null,
+      is_featured !== undefined ? (is_featured ? 1 : 0) : null,
+      sort_order !== undefined ? sort_order : null,
+      itemId
+    ).run();
+
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: 'Menu item not found' }, 404);
+    }
+
+    return jsonResponse({
+      success: true,
+      message: 'Menu item updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating menu item:', error);
+    return jsonResponse({ error: 'Failed to update menu item', details: error.message }, 500);
+  }
+}
+
+/**
+ * DELETE /api/admin/menu/:id
+ * Delete menu item
+ */
+async function deleteMenuItem(request, env, itemId) {
+  try {
+    const db = env.DB;
+
+    const result = await db.prepare(
+      'DELETE FROM menu_items WHERE id = ?'
+    ).bind(itemId).run();
+
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: 'Menu item not found' }, 404);
+    }
+
+    return jsonResponse({
+      success: true,
+      message: 'Menu item deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Error deleting menu item:', error);
+    return jsonResponse({ error: 'Failed to delete menu item', details: error.message }, 500);
+  }
+}
+
+/**
+ * PUT /api/admin/menu/:id/stock
+ * Update menu item stock
+ */
+async function updateMenuStock(request, env, itemId) {
+  try {
+    const body = await request.json();
+    const { stock, operation } = body; // operation: 'set', 'add', 'subtract'
+
+    const db = env.DB;
+
+    let query, params;
+
+    if (operation === 'add') {
+      query = 'UPDATE menu_items SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+      params = [stock, itemId];
+    } else if (operation === 'subtract') {
+      query = 'UPDATE menu_items SET stock = MAX(0, stock - ?), updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+      params = [stock, itemId];
+    } else {
+      query = 'UPDATE menu_items SET stock = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+      params = [stock, itemId];
+    }
+
+    const result = await db.prepare(query).bind(...params).run();
+
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: 'Menu item not found' }, 404);
+    }
+
+    // Get updated item to check if it's sold out
+    const item = await db.prepare('SELECT stock, low_stock_threshold FROM menu_items WHERE id = ?').bind(itemId).first();
+
+    // Auto-mark as unavailable if stock is 0
+    if (item.stock === 0) {
+      await db.prepare('UPDATE menu_items SET available = 0 WHERE id = ?').bind(itemId).run();
+    }
+
+    return jsonResponse({
+      success: true,
+      stock: item.stock,
+      is_low_stock: item.stock > 0 && item.stock <= item.low_stock_threshold,
+      is_sold_out: item.stock === 0,
+      message: 'Stock updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating stock:', error);
+    return jsonResponse({ error: 'Failed to update stock', details: error.message }, 500);
+  }
+}
+
+/**
+ * PUT /api/admin/menu/:id/toggle
+ * Toggle menu item availability
+ */
+async function toggleMenuAvailability(request, env, itemId) {
+  try {
+    const db = env.DB;
+
+    // Get current availability
+    const item = await db.prepare('SELECT available FROM menu_items WHERE id = ?').bind(itemId).first();
+
+    if (!item) {
+      return jsonResponse({ error: 'Menu item not found' }, 404);
+    }
+
+    const newAvailability = item.available === 1 ? 0 : 1;
+
+    await db.prepare(
+      'UPDATE menu_items SET available = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+    ).bind(newAvailability, itemId).run();
+
+    return jsonResponse({
+      success: true,
+      available: newAvailability,
+      message: `Menu item ${newAvailability === 1 ? 'enabled' : 'disabled'} successfully`
+    });
+
+  } catch (error) {
+    console.error('Error toggling availability:', error);
+    return jsonResponse({ error: 'Failed to toggle availability', details: error.message }, 500);
   }
 }
 

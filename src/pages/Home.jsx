@@ -1,18 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ItemCard from '../ui/ItemCard'
-
-const SAMPLE_ITEMS = [
-  {id:1, name:'Curry Rice', price_cents:20000, category:'Rice Bowls', img:'/curry.jpeg'},
-  {id:2, name:'Panda Teriyaki', price_cents:20000, category:'Rice Bowls', img:'/panda teriyaki.jpeg'},
-  {id:3, name:'Japanese Sando', price_cents:10000, category:'Desserts', img:'/japanese sando.jpeg'},
-  {id:4, name:'Java Tea', price_cents:10000, category:'Beverages', img:'/java tea.jpeg'}
-]
+import { api } from '../api/client'
 
 export default function Home(){
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
-  const categories = ['All', ...Array.from(new Set(SAMPLE_ITEMS.map(i=>i.category)))]
-  const items = SAMPLE_ITEMS.filter(i=>(category==='All' || i.category===category) && i.name.toLowerCase().includes(query.toLowerCase()))
+  const [menuItems, setMenuItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetchMenuItems()
+  }, [])
+
+  const fetchMenuItems = async () => {
+    try {
+      setLoading(true)
+      const response = await api.get('/api/menu')
+      setMenuItems(response.data.items || [])
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching menu:', err)
+      setError('Failed to load menu items')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const categories = ['All', ...Array.from(new Set(menuItems.map(i=>i.category)))]
+  const items = menuItems.filter(i=>(category==='All' || i.category===category) && i.name.toLowerCase().includes(query.toLowerCase()))
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -120,8 +136,34 @@ export default function Home(){
           </span>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <svg className="animate-spin h-12 w-12 text-[#4B7342] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <p className="text-gray-600">Loading menu...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+            <svg className="w-12 h-12 text-red-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-700 font-medium">{error}</p>
+            <button
+              onClick={fetchMenuItems}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
         {/* Menu Grid */}
-        {items.length > 0 ? (
+        {!loading && !error && items.length > 0 ? (
           <>
             {/* Mobile: Horizontal Scrollable */}
             <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">

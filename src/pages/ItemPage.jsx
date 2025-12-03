@@ -1,68 +1,55 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { CartContext } from '../state/CartContext'
 import { motion } from 'framer-motion'
+import { api } from '../api/client'
 
-// Sample menu data - in production, fetch from API or props
-const MENU_ITEMS = {
-  '1': {
-    id: '1',
-    name: 'Curry Rice',
-    price: 20000,
-    image: '/curry.jpeg',
-    description: 'A hearty curry made with tender pork, carrots, and potatoes for a rich, comforting flavor in every bite.',
-    customizations: [
-      { id: 'spice', name: 'Spice Level', options: ['Mild', 'Medium', 'Hot', 'Extra Hot'] },
-      { id: 'extras', name: 'Add-ons', options: ['Egg', 'Cheese', 'Extra Rice'], isMulti: true }
-    ]
-  },
-  '2': {
-    id: '2',
-    name: 'Panda Teriyaki',
-    price: 20000,
-    image: '/panda teriyaki.jpeg',
-    description: 'Tender chicken glazed with teriyaki sauce, served with rice alongside cabbage for a healthy delicious meal',
-    customizations: [
-      { id: 'extras', name: 'Add-ons', options: ['Extra Chicken', 'Extra Vegetables', 'Fried Egg'], isMulti: true }
-    ]
-  },
-  '3': {
-    id: '3',
-    name: 'Japanese Sando',
-    price: 10000,
-    image: '/japanese sando.jpeg',
-    description: 'A delicacy filled with sweet whipped cream, fresh shine muscat, strawberries, and a slice of mango!',
-    customizations: []
-  },
-  '4': {
-    id: '4',
-    name: 'Java Tea',
-    price: 10000,
-    image: '/java tea.jpeg',
-    description: 'A refreshing herbal blend made from pandan leaf, black tea, and basil seeds for a naturally aromatic and soothing drink.',
-    customizations: [
-      { id: 'ice', name: 'Ice Level', options: ['Regular Ice', 'Less Ice', 'No Ice'] },
-      { id: 'sweetness', name: 'Sweetness', options: ['Regular', 'Less Sweet', 'No Sugar'] }
-    ]
-  }
+// Customization templates for different items (until we add to DB)
+const CUSTOMIZATIONS = {
+  'Curry Rice': [
+    { id: 'spice', name: 'Spice Level', options: ['Mild', 'Medium', 'Hot', 'Extra Hot'] },
+    { id: 'extras', name: 'Add-ons', options: ['Egg', 'Cheese', 'Extra Rice'], isMulti: true }
+  ],
+  'Panda Teriyaki': [
+    { id: 'extras', name: 'Add-ons', options: ['Extra Chicken', 'Extra Vegetables', 'Fried Egg'], isMulti: true }
+  ],
+  'Java Tea': [
+    { id: 'ice', name: 'Ice Level', options: ['Regular Ice', 'Less Ice', 'No Ice'] },
+    { id: 'sweetness', name: 'Sweetness', options: ['Regular', 'Less Sweet', 'No Sugar'] }
+  ]
 }
 
 export default function ItemPage(){
   const { id } = useParams()
   const navigate = useNavigate()
   const { addItem } = useContext(CartContext)
-
-  const item = MENU_ITEMS[id] || {
-    id,
-    name: 'Item Not Found',
-    price: 0,
-    image: '/logo.jpeg',
-    description: 'This item does not exist.',
-    customizations: []
-  }
-
+  const [item, setItem] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [qty, setQty] = useState(1)
   const [choices, setChoices] = useState({})
+
+  useEffect(() => {
+    fetchItem()
+  }, [id])
+
+  const fetchItem = async () => {
+    try {
+      setLoading(true)
+      const response = await api.get(`/api/menu/${id}`)
+      const itemData = response.data
+      // Add customizations based on item name
+      itemData.customizations = CUSTOMIZATIONS[itemData.name] || []
+      setItem(itemData)
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching item:', err)
+      setError('Item not found')
+      setItem(null)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   function setChoice(custId, value, isMulti){
     if(isMulti) {
@@ -103,6 +90,50 @@ export default function ItemPage(){
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-[#4B7342] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <p className="text-gray-600">Loading item...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !item) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+        <div className="max-w-2xl mx-auto px-4">
+          <button
+            onClick={() => navigate('/')}
+            className="mb-6 text-gray-600 hover:text-[#6B4E3D] flex items-center gap-2 font-medium"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Menu
+          </button>
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
+            <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Item Not Found</h2>
+            <p className="text-red-700 mb-4">{error || 'This item does not exist'}</p>
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-[#4B7342] text-white rounded-lg hover:bg-[#3d5c35] font-medium"
+            >
+              Return to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
       <div className="max-w-7xl mx-auto px-4">
@@ -129,10 +160,20 @@ export default function ItemPage(){
           >
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden p-6 border border-gray-100">
               <img
-                src={item.image}
+                src={item.image_url || item.image}
                 alt={item.name}
                 className="w-full aspect-square object-cover rounded-2xl"
               />
+              {item.is_sold_out && (
+                <div className="mt-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-center font-medium">
+                  Sold Out
+                </div>
+              )}
+              {item.is_low_stock && !item.is_sold_out && (
+                <div className="mt-4 bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-2 rounded-lg text-center font-medium">
+                  Only {item.stock} left!
+                </div>
+              )}
             </div>
           </motion.div>
 
