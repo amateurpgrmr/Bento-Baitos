@@ -76,6 +76,25 @@ export default function OrderStatus(){
     }
   }
 
+  const handlePaidCash = async () => {
+    if (!window.confirm('Confirm that you have paid with cash?')) return
+
+    setUploading(true)
+    try {
+      // Mark order as cash paid
+      await api.post(`/api/orders/${orderId}/cash-paid`)
+
+      // Refresh order data
+      await fetchOrder()
+      alert('Payment confirmed! Thank you.')
+    } catch (err) {
+      console.error('Cash payment error:', err)
+      alert('Failed to confirm cash payment')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800',
@@ -324,6 +343,25 @@ export default function OrderStatus(){
                 </>
               )}
             </button>
+
+            {/* Paid Cash Button - Optional cash confirmation */}
+            <div className="mt-4 pt-4 border-t-2 border-gray-200">
+              <p className="text-sm text-gray-600 mb-3 text-center">Or, if you're paying with cash:</p>
+              <button
+                onClick={handlePaidCash}
+                disabled={uploading}
+                className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-2 ${
+                  uploading
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-xl'
+                }`}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                I Paid with Cash
+              </button>
+            </div>
           </motion.div>
         )}
       </div>

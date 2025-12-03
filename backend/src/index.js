@@ -34,6 +34,10 @@ export default {
         const orderId = path.split('/')[3];
         response = await uploadPaymentProof(request, env, orderId);
       }
+      else if (path.match(/^\/api\/orders\/[^/]+\/cash-paid$/) && request.method === 'POST') {
+        const orderId = path.split('/')[3];
+        response = await markCashPaid(request, env, orderId);
+      }
       else if (path.match(/^\/api\/orders\/[^/]+$/) && request.method === 'GET') {
         const orderId = path.split('/')[3];
         response = await getOrderById(request, env, orderId);
@@ -281,6 +285,34 @@ async function uploadPaymentProof(request, env, orderUid) {
   } catch (error) {
     console.error('Error uploading payment proof:', error);
     return jsonResponse({ error: 'Failed to upload payment proof', details: error.message }, 500);
+  }
+}
+
+/**
+ * POST /api/orders/:orderId/cash-paid
+ * Mark order as paid with cash
+ */
+async function markCashPaid(request, env, orderUid) {
+  try {
+    const db = env.DB;
+
+    // Update order to mark as cash paid and verified
+    const result = await db.prepare(
+      'UPDATE orders SET payment_verified = 1, updated_at = CURRENT_TIMESTAMP WHERE order_uid = ?'
+    ).bind(orderUid).run();
+
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: 'Order not found' }, 404);
+    }
+
+    return jsonResponse({
+      success: true,
+      message: 'Cash payment confirmed successfully'
+    });
+
+  } catch (error) {
+    console.error('Error marking cash payment:', error);
+    return jsonResponse({ error: 'Failed to confirm cash payment', details: error.message }, 500);
   }
 }
 
