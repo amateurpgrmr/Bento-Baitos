@@ -43,13 +43,27 @@ export default function Home(){
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
-        <div className="relative max-w-7xl mx-auto text-center z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">Welcome to Bento Baitos</h1>
-          <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-md">
-            Our P4 Project: A Taste of Home
-          </p>
-        </div>
+        <a href="/group pic.jpeg">
+      <div
+        className="relative text-white py-24 px-4 mb-8 shadow-lg bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(/group%20pic.jpeg)',
+          backgroundPosition: 'center',
+        }}
+      >
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+          <div className="relative max-w-7xl mx-auto text-center z-10">
+            <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
+              Welcome to Bento Baitos
+            </h1>
+            <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-md">
+              Our P4 Project: A Taste of Home
+            </p>
+          </div>
       </div>
+    </a>
+
 
       <div className="max-w-7xl mx-auto px-4 pb-12">
         {/* Search & Filter Section */}

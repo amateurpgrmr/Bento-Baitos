@@ -244,11 +244,11 @@ export default function OrderStatus(){
               <div className="space-y-2">
                 <div className="flex justify-between items-center bg-white bg-opacity-10 rounded-lg p-3">
                   <span className="font-medium opacity-90">Bank</span>
-                  <span className="font-bold">BCA</span>
+                  <span className="font-bold">BCA | Sheina Angela</span>
                 </div>
                 <div className="flex justify-between items-center bg-white bg-opacity-10 rounded-lg p-3">
                   <span className="font-medium opacity-90">Account</span>
-                  <span className="font-bold font-mono">1234567890</span>
+                  <span className="font-bold font-mono">3500032340</span>
                 </div>
                 <div className="flex justify-between items-center bg-white bg-opacity-10 rounded-lg p-3">
                   <span className="font-medium opacity-90">Name</span>

@@ -200,8 +200,8 @@ async function createOrder(request, env) {
       total_cents: total_price,
       status: 'pending',
       payment: {
-        bank: 'BCA',
-        account_number: '1234567890',
+        bank: 'BCA | Sheina Angela',
+        account_number: '3500032340',
         account_holder: 'Bento Baitos',
         qr_code_url: '' // Optional: add QR code URL if you have one
       },
