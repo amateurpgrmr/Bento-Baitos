@@ -167,23 +167,9 @@ export default function Home(){
 
         {/* Menu Grid */}
         {!loading && !error && items.length > 0 ? (
-          <>
-            {/* Mobile: Horizontal Scrollable */}
-            <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">
-              <div className="flex gap-4" style={{ width: 'max-content' }}>
-                {items.map(i=> (
-                  <div key={i.id} style={{ width: '280px', flexShrink: 0 }}>
-                    <ItemCard item={i} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop: 4 Column Grid */}
-            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {items.map(i=> <ItemCard key={i.id} item={i} />)}
-            </div>
-          </>
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {items.map(i=> <ItemCard key={i.id} item={i} />)}
+          </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
             <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

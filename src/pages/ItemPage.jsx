@@ -6,16 +6,8 @@ import { api } from '../api/client'
 
 // Customization templates for different items (until we add to DB)
 const CUSTOMIZATIONS = {
-  'Curry Rice': [
-    { id: 'spice', name: 'Spice Level', options: ['Mild', 'Medium', 'Hot', 'Extra Hot'] },
-    { id: 'extras', name: 'Add-ons', options: ['Egg', 'Cheese', 'Extra Rice'], isMulti: true }
-  ],
-  'Panda Teriyaki': [
-    { id: 'extras', name: 'Add-ons', options: ['Extra Chicken', 'Extra Vegetables', 'Fried Egg'], isMulti: true }
-  ],
   'Java Tea': [
-    { id: 'ice', name: 'Ice Level', options: ['Regular Ice', 'Less Ice', 'No Ice'] },
-    { id: 'sweetness', name: 'Sweetness', options: ['Regular', 'Less Sweet', 'No Sugar'] }
+    { id: 'ice', name: 'Ice Level', options: ['Ice', 'Less Ice'] }
   ]
 }
 
