@@ -33,24 +33,14 @@ export default function Home(){
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Hero Section with Background Image */}
-      <div
-        className="relative text-white py-24 px-4 mb-8 shadow-lg bg-cover bg-center"
-        style={{
-          backgroundImage: 'url(/group pic.jpeg)',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-
-        <a href="/group pic.jpeg">
-      <div
-        className="relative text-white py-24 px-4 mb-8 shadow-lg bg-cover bg-center"
-        style={{
-          backgroundImage: 'url(/group%20pic.jpeg)',
-          backgroundPosition: 'center',
-        }}
-      >
+      <a href="/group pic.jpeg">
+        <div
+          className="relative text-white py-24 px-4 mb-8 shadow-lg bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(/group%20pic.jpeg)',
+            backgroundPosition: 'center',
+          }}
+        >
           <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
           <div className="relative max-w-7xl mx-auto text-center z-10">
@@ -61,9 +51,8 @@ export default function Home(){
               Our P4 Project: A Taste of Home
             </p>
           </div>
-      </div>
-    </a>
-
+        </div>
+      </a>
 
       <div className="max-w-7xl mx-auto px-4 pb-12">
         {/* Search & Filter Section */}
