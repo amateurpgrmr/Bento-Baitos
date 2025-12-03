@@ -172,9 +172,11 @@ async function createOrder(request, env) {
     }
 
     // 2. Insert order
+    // Auto-verify cash payments
+    const payment_verified = payment_method === 'cash' ? 1 : 0;
     const insertOrder = await db.prepare(
-      'INSERT INTO orders (order_uid, user_id, total_price, payment_method, status) VALUES (?, ?, ?, ?, ?)'
-    ).bind(order_uid, userId, total_price, payment_method, 'pending').run();
+      'INSERT INTO orders (order_uid, user_id, total_price, payment_method, payment_verified, status) VALUES (?, ?, ?, ?, ?, ?)'
+    ).bind(order_uid, userId, total_price, payment_method, payment_verified, 'pending').run();
 
     const orderId = insertOrder.meta.last_row_id;
 
@@ -193,20 +195,30 @@ async function createOrder(request, env) {
     }
 
     // Return success response with order details
-    return jsonResponse({
+    const response = {
       success: true,
       order_uid: order_uid,
       order_id: orderId,
       total_cents: total_price,
       status: 'pending',
-      payment: {
+      payment_method: payment_method,
+      payment_verified: payment_verified
+    };
+
+    // Add bank details only for bank transfer
+    if (payment_method === 'bank_transfer') {
+      response.payment = {
         bank: 'BCA | Sheina Angela',
         account_number: '3500032340',
         account_holder: 'Bento Baitos',
-        qr_code_url: '' // Optional: add QR code URL if you have one
-      },
-      message: 'Order created successfully. Please transfer the exact amount and upload payment proof.'
-    }, 201);
+        qr_code_url: ''
+      };
+      response.message = 'Order created successfully. Please transfer the exact amount and upload payment proof.';
+    } else {
+      response.message = 'Order created successfully. Pay with cash when you receive your order.';
+    }
+
+    return jsonResponse(response, 201);
 
   } catch (error) {
     console.error('Error creating order:', error);

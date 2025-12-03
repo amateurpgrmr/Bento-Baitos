@@ -8,6 +8,7 @@ export default function Checkout(){
   const { cart, subtotal, clear } = useContext(CartContext)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('cash')
   const [proof, setProof] = useState(null)
   const [proofPreview, setProofPreview] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -43,7 +44,7 @@ export default function Checkout(){
         unit_price_cents:i.unit_price_cents,
         customizations:i.customizations
       })),
-      payment_method: 'bank_transfer'
+      payment_method: paymentMethod
     }
 
     try {
@@ -51,23 +52,27 @@ export default function Checkout(){
       const res = await api.post('/api/orders', payload)
       const { order_uid } = res.data
 
-      // If proof chosen, upload
-      if (proof) {
-        const fd = new FormData()
-        fd.append('proof', proof)
-        await api.post(`/api/orders/${order_uid}/proof`, fd)
-        // Only clear cart if payment proof was uploaded
+      // For cash payments, clear cart immediately
+      if (paymentMethod === 'cash') {
         clear()
       } else {
-        // Store pending order info in localStorage for later payment proof upload
-        const pendingOrder = {
-          order_uid,
-          customer_name: name,
-          phone,
-          total: subtotal(),
-          created_at: new Date().toISOString()
+        // For bank transfer, handle proof upload
+        if (proof) {
+          const fd = new FormData()
+          fd.append('proof', proof)
+          await api.post(`/api/orders/${order_uid}/proof`, fd)
+          clear()
+        } else {
+          // Store pending order info in localStorage for later payment proof upload
+          const pendingOrder = {
+            order_uid,
+            customer_name: name,
+            phone,
+            total: subtotal(),
+            created_at: new Date().toISOString()
+          }
+          localStorage.setItem('pending_order', JSON.stringify(pendingOrder))
         }
-        localStorage.setItem('pending_order', JSON.stringify(pendingOrder))
       }
 
       // Redirect to order status
@@ -131,6 +136,81 @@ export default function Checkout(){
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-3 space-y-6"
           >
+            {/* Payment Method Selection */}
+            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="bg-[#4B7342] text-white p-3 rounded-xl">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Payment Method</h3>
+                  <p className="text-sm text-gray-600">Choose how you'd like to pay</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Cash Option */}
+                <motion.button
+                  onClick={() => setPaymentMethod('cash')}
+                  className={`p-6 rounded-2xl border-2 transition-all text-left ${
+                    paymentMethod === 'cash'
+                      ? 'border-[#4B7342] bg-green-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${paymentMethod === 'cash' ? 'bg-[#4B7342] text-white' : 'bg-gray-100 text-gray-600'}`}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-bold text-lg mb-1">Cash</div>
+                      <div className="text-sm text-gray-600">Pay when you receive your order</div>
+                    </div>
+                    {paymentMethod === 'cash' && (
+                      <svg className="w-6 h-6 text-[#4B7342]" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </motion.button>
+
+                {/* Bank Transfer Option */}
+                <motion.button
+                  onClick={() => setPaymentMethod('bank_transfer')}
+                  className={`p-6 rounded-2xl border-2 transition-all text-left ${
+                    paymentMethod === 'bank_transfer'
+                      ? 'border-[#4B7342] bg-green-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${paymentMethod === 'bank_transfer' ? 'bg-[#4B7342] text-white' : 'bg-gray-100 text-gray-600'}`}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-bold text-lg mb-1">Bank Transfer</div>
+                      <div className="text-sm text-gray-600">Transfer to our bank account</div>
+                    </div>
+                    {paymentMethod === 'bank_transfer' && (
+                      <svg className="w-6 h-6 text-[#4B7342]" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </motion.button>
+              </div>
+            </div>
+
             {/* Customer Information Card */}
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
               <div className="flex items-center gap-3 mb-6">
@@ -198,7 +278,8 @@ export default function Checkout(){
               </div>
             </div>
 
-            {/* Payment Proof Upload Card */}
+            {/* Payment Proof Upload Card - Only for Bank Transfer */}
+            {paymentMethod === 'bank_transfer' && (
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
               <div className="flex items-center gap-3 mb-6">
                 <div className="bg-[#4B7342] text-white p-3 rounded-xl">
@@ -279,6 +360,7 @@ export default function Checkout(){
                 </motion.div>
               )}
             </div>
+            )}
           </motion.div>
 
           {/* Right: Order Summary - Takes 2 columns */}
