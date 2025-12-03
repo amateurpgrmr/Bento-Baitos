@@ -9,6 +9,7 @@ import AdminLogin from './admin/Login'
 import ProtectedRoute from './admin/ProtectedRoute'
 import Header from './components/Header'
 import CartDrawer from './components/CartDrawer'
+import FloatingAdminButton from './components/FloatingAdminButton'
 import { AdminAuthProvider } from './state/AdminAuthContext'
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
       <AdminAuthProvider>
         <Header />
         <CartDrawer />
+        <FloatingAdminButton />
         <main className="p-4 max-w-6xl mx-auto">
           <Routes>
             <Route path="/" element={<Home />} />
