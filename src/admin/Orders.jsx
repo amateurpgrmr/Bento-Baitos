@@ -75,6 +75,41 @@ export default function Orders(){
     );
   }
 
+  const exportToCSV = () => {
+    // Prepare CSV data
+    const headers = ['Order ID', 'Date', 'Customer Name', 'Phone', 'Items', 'Total (Rp)', 'Payment Method', 'Status'];
+    const rows = orders.map(order => {
+      const itemsStr = order.items?.map(item => `${item.quantity}x ${item.item_name}`).join('; ') || '';
+      return [
+        order.order_uid || order.id,
+        new Date(order.created_at).toLocaleString(),
+        order.customer_name || '',
+        order.phone || '',
+        itemsStr,
+        order.total_price,
+        order.payment_method || '',
+        order.status
+      ];
+    });
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (error) {
     return (
       <div>
@@ -90,19 +125,35 @@ export default function Orders(){
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold">Orders ({orders.length})</h2>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded"
-        >
-          <option value="all">All Orders</option>
-          <option value="pending">Pending</option>
-          <option value="paid">Paid</option>
-          <option value="preparing">Preparing</option>
-          <option value="ready">Ready</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <div className="flex gap-3">
+          <button
+            onClick={exportToCSV}
+            disabled={orders.length === 0}
+            className={`px-4 py-2 rounded flex items-center gap-2 font-medium transition-colors ${
+              orders.length === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-[#4B7342] text-white hover:bg-[#3d5c35]'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export CSV
+          </button>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border rounded"
+          >
+            <option value="all">All Orders</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="preparing">Preparing</option>
+            <option value="ready">Ready</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {!orders.length ? (

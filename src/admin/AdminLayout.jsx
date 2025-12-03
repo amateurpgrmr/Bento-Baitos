@@ -5,6 +5,7 @@ import MenuManager from './MenuManager'
 import Orders from './Orders'
 import ProofsReview from './ProofsReview'
 import Stats from './Stats'
+import QuickOrder from './QuickOrder'
 
 export default function AdminLayout(){
   const { logout } = useAdminAuth()
@@ -21,8 +22,8 @@ export default function AdminLayout(){
         <h3 className="font-semibold mb-4 text-lg">Admin Panel</h3>
         <ul className="space-y-2 text-sm">
           <li><Link to="" className="block px-3 py-2 rounded hover:bg-gray-100 transition-colors">Dashboard</Link></li>
+          <li><Link to="quick-order" className="block px-3 py-2 rounded hover:bg-green-100 transition-colors bg-green-50 border border-green-200 font-semibold text-[#4B7342]">Quick Order</Link></li>
           <li><Link to="orders" className="block px-3 py-2 rounded hover:bg-gray-100 transition-colors">Orders</Link></li>
-          <li><Link to="stats" className="block px-3 py-2 rounded hover:bg-gray-100 transition-colors">Analytics & Stats</Link></li>
           <li><Link to="menu" className="block px-3 py-2 rounded hover:bg-gray-100 transition-colors">Menu Manager</Link></li>
           <li><Link to="proofs" className="block px-3 py-2 rounded hover:bg-gray-100 transition-colors">Payment Proofs</Link></li>
         </ul>
@@ -41,6 +42,7 @@ export default function AdminLayout(){
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<Dashboard/>} />
+          <Route path="quick-order" element={<QuickOrder/>} />
           <Route path="orders" element={<Orders/>} />
           <Route path="stats" element={<Stats/>} />
           <Route path="menu" element={<MenuManager/>} />
