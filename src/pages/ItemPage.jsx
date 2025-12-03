@@ -6,9 +6,7 @@ import { api } from '../api/client'
 
 // Customization templates for different items (until we add to DB)
 const CUSTOMIZATIONS = {
-  'Java Tea': [
-    { id: 'ice', name: 'Ice Level', options: ['Ice', 'Less Ice'] }
-  ]
+  // All customizations removed per user request
 }
 
 export default function ItemPage(){
