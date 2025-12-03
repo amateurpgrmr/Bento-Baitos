@@ -51,6 +51,10 @@ export default {
         const orderId = path.split('/')[4];
         response = await updateOrderStatus(request, env, orderId);
       }
+      else if (path.match(/^\/api\/admin\/orders\/\d+\/verify-payment$/) && request.method === 'PUT') {
+        const orderId = path.split('/')[4];
+        response = await verifyPayment(request, env, orderId);
+      }
       else if (path === '/api/admin/stats' && request.method === 'GET') {
         response = await getAdminStats(request, env);
       }
@@ -148,7 +152,7 @@ async function createOrder(request, env) {
         'INSERT INTO order_items (order_id, item_name, quantity, unit_price, customizations) VALUES (?, ?, ?, ?, ?)'
       ).bind(
         orderId,
-        item.item_id || item.name || 'Unknown Item',
+        item.name || `Item ${item.item_id}` || 'Unknown Item',
         item.quantity,
         item.unit_price_cents,
         customizations
@@ -364,7 +368,7 @@ async function getAdminOrders(request, env) {
     let query = `
       SELECT
         o.id, o.order_uid, o.total_price, o.payment_proof_url,
-        o.payment_method, o.status, o.created_at, o.updated_at,
+        o.payment_method, o.status, o.payment_verified, o.created_at, o.updated_at,
         u.name as customer_name, u.phone
       FROM orders o
       JOIN users u ON o.user_id = u.id
@@ -399,6 +403,7 @@ async function getAdminOrders(request, env) {
           status: order.status,
           payment_method: order.payment_method,
           payment_proof_url: order.payment_proof_url,
+          payment_verified: order.payment_verified || false,
           total_price: order.total_price,
           items: items.results,
           created_at: order.created_at,
@@ -465,6 +470,34 @@ async function updateOrderStatus(request, env, orderId) {
   } catch (error) {
     console.error('Error updating order status:', error);
     return jsonResponse({ error: 'Failed to update order status', details: error.message }, 500);
+  }
+}
+
+/**
+ * PUT /api/admin/orders/:id/verify-payment
+ * Mark payment as verified for an order
+ */
+async function verifyPayment(request, env, orderId) {
+  try {
+    const db = env.DB;
+
+    const result = await db.prepare(
+      'UPDATE orders SET payment_verified = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+    ).bind(orderId).run();
+
+    if (result.meta.changes === 0) {
+      return jsonResponse({ error: 'Order not found' }, 404);
+    }
+
+    return jsonResponse({
+      success: true,
+      order_id: orderId,
+      message: 'Payment verified successfully'
+    });
+
+  } catch (error) {
+    console.error('Error verifying payment:', error);
+    return jsonResponse({ error: 'Failed to verify payment', details: error.message }, 500);
   }
 }
 

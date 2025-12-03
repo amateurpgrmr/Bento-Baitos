@@ -38,6 +38,7 @@ export default function Checkout(){
       phone,
       items: cart.map(i=>({
         item_id:i.item_id,
+        name:i.name,
         quantity:i.quantity,
         unit_price_cents:i.unit_price_cents,
         customizations:i.customizations
@@ -55,10 +56,21 @@ export default function Checkout(){
         const fd = new FormData()
         fd.append('proof', proof)
         await api.post(`/api/orders/${order_uid}/proof`, fd)
+        // Only clear cart if payment proof was uploaded
+        clear()
+      } else {
+        // Store pending order info in localStorage for later payment proof upload
+        const pendingOrder = {
+          order_uid,
+          customer_name: name,
+          phone,
+          total: subtotal(),
+          created_at: new Date().toISOString()
+        }
+        localStorage.setItem('pending_order', JSON.stringify(pendingOrder))
       }
 
-      // Clear cart and redirect
-      clear()
+      // Redirect to order status
       nav(`/status/${order_uid}`)
     } catch(e){
       console.error('Order error:', e)

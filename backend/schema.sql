@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS orders (
   user_id INTEGER NOT NULL,
   total_price INTEGER NOT NULL, -- in cents (Rp)
   payment_proof_url TEXT, -- URL to R2 stored image or NULL
+  payment_verified INTEGER DEFAULT 0, -- 0 = not verified, 1 = verified by admin
   payment_method TEXT DEFAULT 'bank_transfer',
   status TEXT DEFAULT 'pending', -- pending, paid, preparing, ready, completed, cancelled
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
